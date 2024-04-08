@@ -11,5 +11,5 @@ project(minesweeper)
 set(SFML_DIR "/lib/cmake/SFML")
 
 find_package(SFML 2.5.1 COMPONENTS system window graphics audio REQUIRED)
-add_executable(minesweeper main.cpp)
+add_executable(minesweeper src/main.cpp)
 target_link_libraries(minesweeper sfml-system sfml-window sfml-graphics sfml-audio)
