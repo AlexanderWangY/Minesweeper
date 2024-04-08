@@ -41,7 +41,7 @@ public:
 class GameScreen : public Screen {
 private:
   sf::RenderWindow *window;
-  Board *myBoard;
+  Board myBoard;
 
   // For window sizing
   int width;

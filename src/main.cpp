@@ -38,53 +38,50 @@ int main() {
   int screenWidth = config.columns * 32;
   int screenHeight = (config.rows * 32) + 100;
 
-  // sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight),
-  //                         "Minesweeper", sf::Style::Close);
+  sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight),
+                          "Minesweeper", sf::Style::Close);
 
-  // GameScreen gamescreen(screenWidth, screenHeight, config.columns,
-  // config.rows,
-  //                       config.bombCount);
-  // while (window.isOpen()) {
-  //   sf::Event event;
-  //   while (window.pollEvent(event)) {
-  //     if (event.type == sf::Event::Closed) {
-  //       window.close();
-  //     }
-  //   }
+  GameScreen gamescreen(screenWidth, screenHeight, config.columns, config.rows,
+                        config.bombCount);
+  while (window.isOpen()) {
+    sf::Event event;
+    while (window.pollEvent(event)) {
+      gamescreen.handleEvent(event);
+    }
 
-  //   window.clear();
-  //   gamescreen.render(window);
-  //   window.display();
-  // }
+    window.clear();
+    gamescreen.render(window);
+    window.display();
+  }
 
   // Now rendering the main pages
   // int screenWidth = config.columns * 32;
   // int screenHeight = (config.rows * 32) + 100;
 
-  sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight),
-                          "Minesweeper", sf::Style::Close);
+  // sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight),
+  //                         "Minesweeper", sf::Style::Close);
 
-  TitleScreen titlescreen(screenWidth, screenHeight);
+  // TitleScreen titlescreen(screenWidth, screenHeight);
 
-  while (window.isOpen()) {
-    sf::Event event;
-    while (window.pollEvent(event)) {
-      if (event.type == sf::Event::Closed) {
-        window.close();
-      } else {
-        titlescreen.handleEvent(event);
-      }
-    }
+  // while (window.isOpen()) {
+  //   sf::Event event;
+  //   while (window.pollEvent(event)) {
+  //     if (event.type == sf::Event::Closed) {
+  //       window.close();
+  //     } else {
+  //       titlescreen.handleEvent(event);
+  //     }
+  //   }
 
-    titlescreen.update();
-    window.clear();
-    titlescreen.render(window);
-    window.display();
-  }
+  //   titlescreen.update();
+  //   window.clear();
+  //   titlescreen.render(window);
+  //   window.display();
+  // }
 
-  std::string username = titlescreen.getUsername();
+  // std::string username = titlescreen.getUsername();
 
-  std::cout << "Username: " << username << std::endl;
+  // std::cout << "Username: " << username << std::endl;
 
   return 0;
 }

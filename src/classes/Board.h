@@ -18,8 +18,14 @@ private:
   int bombCount;
 
 public:
-  Board(int _columns, int _rows, int _bombCount) {
-    // Assign values
+  Board() {
+    columns = 0;
+    rows = 0;
+    bombCount = 0;
+  }
+
+  void loadBoard(int _columns, int _rows, int _bombCount) {
+
     columns = _columns;
     rows = _rows;
     bombCount = _bombCount;
@@ -37,17 +43,17 @@ public:
 
     // Populate map with textures
     try {
-      textureMap[-3].loadFromFile("../files/images/flag.png");
-      textureMap[-2].loadFromFile("../files/images/tile_revealed.png");
-      textureMap[-1].loadFromFile("../files/images/mine.png");
-      textureMap[0].loadFromFile("../files/images/tile_hidden.png");
-      textureMap[1].loadFromFile("../files/images/number_1.png");
-      textureMap[2].loadFromFile("../files/images/number_2.png");
-      textureMap[3].loadFromFile("../files/images/number_3.png");
-      textureMap[4].loadFromFile("../files/images/number_4.png");
-      textureMap[5].loadFromFile("../files/images/number_5.png");
-      textureMap[6].loadFromFile("../files/images/number_6.png");
-      textureMap[7].loadFromFile("../files/images/number_7.png");
+      textureMap[-3].loadFromFile("./files/images/flag.png");
+      textureMap[-2].loadFromFile("./files/images/tile_hidden.png");
+      textureMap[-1].loadFromFile("./files/images/mine.png");
+      textureMap[0].loadFromFile("./files/images/tile_revealed.png");
+      textureMap[1].loadFromFile("./files/images/number_1.png");
+      textureMap[2].loadFromFile("./files/images/number_2.png");
+      textureMap[3].loadFromFile("./files/images/number_3.png");
+      textureMap[4].loadFromFile("./files/images/number_4.png");
+      textureMap[5].loadFromFile("./files/images/number_5.png");
+      textureMap[6].loadFromFile("./files/images/number_6.png");
+      textureMap[7].loadFromFile("./files/images/number_7.png");
     } catch (...) {
       std::cerr << "Something went wrong loading images\n";
     }
@@ -55,13 +61,30 @@ public:
     for (int y = 0; y < rows; ++y) {
       std::vector<Cell> entry;
       for (int x = 0; x < columns; ++x) {
-        Cell cell(board[y][x], x, y, textureMap[board[y][x]], textureMap[0],
-                  textureMap[-2], textureMap[-3]);
+        Cell cell(board[y][x], x, y, textureMap[board[y][x]], textureMap[-2],
+                  textureMap[0], textureMap[-3]);
 
         entry.push_back(cell);
       }
 
       cellBoard.push_back(entry);
+    }
+  }
+
+  void handleClick(int x, int y) {
+    bool cellFound = false;
+    for (std::vector<Cell> &row : cellBoard) {
+      for (Cell &c : row) {
+        if (c.withinBounds(x, y)) {
+          int result = c.Click();
+          cellFound = true;
+          break;
+        }
+      }
+
+      if (cellFound) {
+        break;
+      }
     }
   }
 

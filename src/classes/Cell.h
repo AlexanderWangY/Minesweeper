@@ -2,6 +2,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <iostream>
 
 struct Position {
   int x;
@@ -26,8 +27,8 @@ private:
   State state;
 
 public:
-  Cell(int _type, int _x, int _y, sf::Texture _value, sf::Texture _tile,
-       sf::Texture _under, sf::Texture _flag) {
+  Cell(int _type, int _x, int _y, sf::Texture &_value, sf::Texture &_tile,
+       sf::Texture &_under, sf::Texture &_flag) {
     tile.setTexture(_tile);
     under.setTexture(_under);
     flag.setTexture(_flag);
@@ -38,20 +39,24 @@ public:
     state.flagged = false;
     state.revealed = false;
 
-    // Set sprite sizes
+    tile.setPosition(32.f * pos.x, 32.f * pos.y);
+    under.setPosition(pos.x * 32.f, pos.y * 32.f);
+    value.setPosition(pos.x * 32.f, pos.y * 32.f);
+    flag.setPosition(pos.x * 32.f, pos.y * 32.f);
+  }
 
-    tile.scale(.5, .5);
-    under.scale(.5, .5);
-    flag.scale(.5, .5);
-    under.scale(.5, .5);
+  bool withinBounds(int x, int y) {
+    return tile.getGlobalBounds().contains(x, y);
   }
 
   int Click() {
+    std::cout << pos.x << ", " << pos.y << " cell was clicked!\n";
     if (type == -1) {
-      // Reveal
+      state.revealed = true;
       return -1;
     }
 
+    state.revealed = true;
     return 0;
   }
 
@@ -64,7 +69,15 @@ public:
   }
 
   void render(sf::RenderWindow &window) {
-    tile.setPosition(pos.x * 32.f, pos.y * 32.f);
-    window.draw(tile);
+    window.draw(under);
+    window.draw(value);
+
+    if (!state.revealed) {
+      window.draw(tile);
+    }
+
+    if (state.flagged) {
+      window.draw(flag);
+    }
   }
 };

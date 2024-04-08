@@ -1,7 +1,7 @@
-#include <random>
 #pragma once
+#include <random>
 
-int getRandomNumber(int min, int max) {
+inline int getRandomNumber(int min, int max) {
   std::random_device dev;
   std::mt19937 rng(dev());
 
