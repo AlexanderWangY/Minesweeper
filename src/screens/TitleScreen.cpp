@@ -3,8 +3,10 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Window/Event.hpp>
+#include <cctype>
 #include <iostream>
 #include <ostream>
+#include <string>
 
 TitleScreen::TitleScreen(int _width, int _height) {
   font.loadFromFile("./files/font.ttf");
@@ -37,6 +39,10 @@ TitleScreen::TitleScreen(int _width, int _height) {
   setText(userInputText, width / 2, height / 2 - 45);
 }
 
+std::string TitleScreen::getUsername() {
+  return this->userInputText.getString();
+}
+
 void TitleScreen::handleEvent(sf::Event event) {
 
   // Check if event is user entering text!
@@ -44,10 +50,20 @@ void TitleScreen::handleEvent(sf::Event event) {
   if (event.type == sf::Event::TextEntered) {
     if (event.text.unicode < 128) {
 
-      if (event.text.unicode == '\b' && !userInput.isEmpty()) {
+      if (event.text.unicode == '\r' && userInput.getSize() > 0) {
+        window->close();
+      } else if (event.text.unicode == '\b' && !userInput.isEmpty()) {
         userInput.erase(userInput.getSize() - 1);
-      } else if (userInput.getSize() < 10 && event.text.unicode != '\b') {
-        userInput += static_cast<char>(event.text.unicode);
+      } else if (userInput.getSize() < 10 && event.text.unicode != '\b' &&
+                 event.text.unicode != '\r' &&
+                 std::isalpha(static_cast<char>(event.text.unicode))) {
+        if (userInput.getSize() == 0) {
+          userInput += static_cast<char>(
+              std::toupper(static_cast<char>(event.text.unicode)));
+        } else {
+          userInput += static_cast<char>(
+              std::tolower(static_cast<char>(event.text.unicode)));
+        }
       }
     }
   }
@@ -58,9 +74,10 @@ void TitleScreen::update() {
   userInputText.setString(userInput);
 }
 
-void TitleScreen::render(sf::RenderWindow &window) {
-  window.clear(sf::Color::Blue);
-  window.draw(titleText);
-  window.draw(inputPromptText);
-  window.draw(userInputText);
+void TitleScreen::render(sf::RenderWindow &_window) {
+  this->window = &_window;
+  window->clear(sf::Color::Blue);
+  window->draw(titleText);
+  window->draw(inputPromptText);
+  window->draw(userInputText);
 }

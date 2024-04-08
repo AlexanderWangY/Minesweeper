@@ -1,4 +1,7 @@
+#include "classes/Board.h"
+#include "classes/Cell.h"
 #include "screens/Screen.h"
+#include "utils/RandomHelper.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -32,9 +35,31 @@ int main() {
     return 1;
   }
 
-  // Now rendering the main pages
   int screenWidth = config.columns * 32;
   int screenHeight = (config.rows * 32) + 100;
+
+  // sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight),
+  //                         "Minesweeper", sf::Style::Close);
+
+  // GameScreen gamescreen(screenWidth, screenHeight, config.columns,
+  // config.rows,
+  //                       config.bombCount);
+  // while (window.isOpen()) {
+  //   sf::Event event;
+  //   while (window.pollEvent(event)) {
+  //     if (event.type == sf::Event::Closed) {
+  //       window.close();
+  //     }
+  //   }
+
+  //   window.clear();
+  //   gamescreen.render(window);
+  //   window.display();
+  // }
+
+  // Now rendering the main pages
+  // int screenWidth = config.columns * 32;
+  // int screenHeight = (config.rows * 32) + 100;
 
   sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight),
                           "Minesweeper", sf::Style::Close);
@@ -56,6 +81,10 @@ int main() {
     titlescreen.render(window);
     window.display();
   }
+
+  std::string username = titlescreen.getUsername();
+
+  std::cout << "Username: " << username << std::endl;
 
   return 0;
 }
