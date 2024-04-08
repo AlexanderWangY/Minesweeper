@@ -1,28 +1,61 @@
+#include "screens/Screen.h"
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/VideoMode.hpp>
+#include <SFML/Window/WindowStyle.hpp>
+#include <fstream>
 #include <iostream>
+#include <string>
+
+struct Config {
+  unsigned int columns;
+  unsigned int rows;
+  unsigned int bombCount;
+};
 
 int main() {
-  sf::RenderWindow window(sf::VideoMode(200, 200), "SFML Works!");
-  window.setVerticalSyncEnabled(true);
-  sf::CircleShape shape(100.f);
-  shape.setFillColor(sf::Color::Red);
+  Config config;
+
+  std::ifstream file("./files/config.cfg");
+  std::string line;
+
+  if (file.is_open()) {
+    std::getline(file, line);
+    config.columns = std::stoi(line);
+    std::getline(file, line);
+    config.rows = std::stoi(line);
+    std::getline(file, line);
+    config.bombCount = std::stoi(line);
+  } else {
+    std::cerr << "An error occured while trying to open config files\n";
+    return 1;
+  }
+
+  // Now rendering the main pages
+  int screenWidth = config.columns * 32;
+  int screenHeight = (config.rows * 32) + 100;
+
+  sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight),
+                          "Minesweeper", sf::Style::Close);
+
+  TitleScreen titlescreen(screenWidth, screenHeight);
 
   while (window.isOpen()) {
     sf::Event event;
     while (window.pollEvent(event)) {
       if (event.type == sf::Event::Closed) {
         window.close();
+      } else {
+        titlescreen.handleEvent(event);
       }
     }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-      std::cout << "D" << std::endl;
-    }
-
+    titlescreen.update();
     window.clear();
-    window.draw(shape);
+    titlescreen.render(window);
     window.display();
   }
+
   return 0;
 }
