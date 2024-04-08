@@ -88,6 +88,23 @@ public:
     }
   }
 
+  void handleFlag(int x, int y) {
+    bool cellFound = false;
+    for (std::vector<Cell> &row : cellBoard) {
+      for (Cell &c : row) {
+        if (c.withinBounds(x, y)) {
+          int result = c.Flag();
+          cellFound = true;
+          break;
+        }
+      }
+
+      if (cellFound) {
+        break;
+      }
+    }
+  }
+
   void Generate() {
     int generated = 0;
 

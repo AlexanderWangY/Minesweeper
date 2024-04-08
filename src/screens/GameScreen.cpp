@@ -26,10 +26,14 @@ void GameScreen::handleEvent(sf::Event event) {
       int x = event.mouseButton.x;
       int y = event.mouseButton.y;
 
-      std::cout << x << ", " << y << std::endl;
-
       // Now check every cell to see if I click on anything!
       myBoard.handleClick(x, y);
+    } else if (event.mouseButton.button == sf::Mouse::Right) {
+      int x = event.mouseButton.x;
+      int y = event.mouseButton.y;
+
+      // Now check every cell to see if I click on anything!
+      myBoard.handleFlag(x, y);
     }
   }
 }

@@ -51,6 +51,10 @@ public:
 
   int Click() {
     std::cout << pos.x << ", " << pos.y << " cell was clicked!\n";
+    if (state.flagged) {
+      return 1;
+    }
+
     if (type == -1) {
       state.revealed = true;
       return -1;
@@ -58,6 +62,15 @@ public:
 
     state.revealed = true;
     return 0;
+  }
+
+  int Flag() {
+    if (state.revealed != true) {
+      state.flagged = !state.flagged;
+      return 0;
+    } else {
+      return 1;
+    }
   }
 
   void Reveal() {
