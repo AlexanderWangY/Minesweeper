@@ -17,6 +17,10 @@ private:
   int rows;
   int bombCount;
 
+  // Game logiv
+
+  bool disabled;
+
 public:
   Board() {
     columns = 0;
@@ -25,10 +29,13 @@ public:
   }
 
   void loadBoard(int _columns, int _rows, int _bombCount) {
+    board.clear();
+    cellBoard.clear();
 
     columns = _columns;
     rows = _rows;
     bombCount = _bombCount;
+    disabled = false;
     // Fill with zeroes, prep for generation
     for (int r = 0; r < rows; ++r) {
       std::vector<int> entry;
@@ -69,40 +76,59 @@ public:
 
       cellBoard.push_back(entry);
     }
+
+    for (int y = 0; y < rows; ++y) {
+      for (int x = 0; x < columns; ++x) {
+        cellBoard[y][x].setNearbyCells(cellBoard);
+      }
+    }
   }
 
-  void handleClick(int x, int y) {
+  bool checkForWin() {
+    for (std::vector<Cell> &row : cellBoard) {
+      for (Cell &c : row) {
+        if (c.getType() == -1 && !c.isFlagged()) {
+          return false;
+        } else if (c.getType() != -1 && c.isFlagged()) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  int handleClick(int x, int y) {
+    if (disabled) {
+      return 500;
+    }
     bool cellFound = false;
     for (std::vector<Cell> &row : cellBoard) {
       for (Cell &c : row) {
         if (c.withinBounds(x, y)) {
           int result = c.Click();
-          cellFound = true;
-          break;
+
+          return result;
         }
       }
-
-      if (cellFound) {
-        break;
-      }
     }
+
+    return 404;
   }
 
-  void handleFlag(int x, int y) {
+  int handleFlag(int x, int y) {
+    if (disabled) {
+      return 500;
+    }
     bool cellFound = false;
     for (std::vector<Cell> &row : cellBoard) {
       for (Cell &c : row) {
         if (c.withinBounds(x, y)) {
           int result = c.Flag();
-          cellFound = true;
-          break;
+          return result;
         }
       }
-
-      if (cellFound) {
-        break;
-      }
     }
+    return 404;
   }
 
   void Generate() {
@@ -149,6 +175,11 @@ public:
     }
   }
 
+  void toggleDisable() {
+    std::cout << "Toggle disable\n";
+    disabled = !disabled;
+  }
+
   void Display() {
     for (std::vector<int> x : board) {
       for (int val : x) {
@@ -158,10 +189,10 @@ public:
     }
   }
 
-  void render(sf::RenderWindow &window) {
+  void render(sf::RenderWindow &window, bool debug) {
     for (std::vector<Cell> row : cellBoard) {
       for (Cell cell : row) {
-        cell.render(window);
+        cell.render(window, debug);
       }
     }
   }

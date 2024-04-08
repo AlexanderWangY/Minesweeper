@@ -34,26 +34,6 @@ int main() {
     std::cerr << "An error occured while trying to open config files\n";
     return 1;
   }
-
-  int screenWidth = config.columns * 32;
-  int screenHeight = (config.rows * 32) + 100;
-
-  sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight),
-                          "Minesweeper", sf::Style::Close);
-
-  GameScreen gamescreen(screenWidth, screenHeight, config.columns, config.rows,
-                        config.bombCount);
-  while (window.isOpen()) {
-    sf::Event event;
-    while (window.pollEvent(event)) {
-      gamescreen.handleEvent(event);
-    }
-
-    window.clear();
-    gamescreen.render(window);
-    window.display();
-  }
-
   // Now rendering the main pages
   // int screenWidth = config.columns * 32;
   // int screenHeight = (config.rows * 32) + 100;
@@ -82,6 +62,27 @@ int main() {
   // std::string username = titlescreen.getUsername();
 
   // std::cout << "Username: " << username << std::endl;
+
+  int screenWidth = config.columns * 32;
+  int screenHeight = (config.rows * 32) + 100;
+
+  sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight),
+                          "Minesweeper", sf::Style::Close);
+
+  GameScreen gamescreen(screenWidth, screenHeight, config.columns, config.rows,
+                        config.bombCount);
+  while (window.isOpen()) {
+    sf::Event event;
+    while (window.pollEvent(event)) {
+      gamescreen.handleEvent(event);
+    }
+
+    gamescreen.update();
+
+    window.clear();
+    gamescreen.render(window);
+    window.display();
+  }
 
   return 0;
 }
