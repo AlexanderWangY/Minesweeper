@@ -8,6 +8,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/String.hpp>
 #include <SFML/Window/Event.hpp>
+#include <string>
 #include <unordered_map>
 
 class Screen {
@@ -69,6 +70,7 @@ private:
 
   // Actual Chrono Timer class
   Timer timer;
+  int timeTaken;
 
   // For game logic
   bool gameOver = false;
@@ -86,8 +88,12 @@ private:
   int rows;
   int bombCount;
 
+  // Other MISC.
+  std::string username;
+
 public:
-  GameScreen(int _width, int _height, int _columns, int _rows, int _bombCount);
+  GameScreen(int _width, int _height, int _columns, int _rows, int _bombCount,
+             std::string _username);
   ~GameScreen(){};
 
   void handleEvent(sf::Event event) override;
@@ -95,4 +101,24 @@ public:
   void render(sf::RenderWindow &_window) override;
 
   void reset();
+};
+
+class Leaderboard : public Screen {
+private:
+  sf::Font font;
+  sf::Text titleText;
+  sf::Text leaderboardText;
+  sf::RenderWindow *window;
+
+  // For window sizing
+
+  int width;
+  int height;
+
+public:
+  Leaderboard(int _width, int _height);
+
+  void handleEvent(sf::Event event) override;
+  void update() override;
+  void render(sf::RenderWindow &_window) override;
 };

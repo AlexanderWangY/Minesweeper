@@ -39,36 +39,33 @@ int main() {
     return 1;
   }
   // Now rendering the main pages
-  // int screenWidth = config.columns * 32;
-  // int screenHeight = (config.rows * 32) + 100;
-
-  // sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight),
-  //                         "Minesweeper", sf::Style::Close);
-
-  // TitleScreen titlescreen(screenWidth, screenHeight);
-
-  // while (window.isOpen()) {
-  //   sf::Event event;
-  //   while (window.pollEvent(event)) {
-  //     if (event.type == sf::Event::Closed) {
-  //       window.close();
-  //     } else {
-  //       titlescreen.handleEvent(event);
-  //     }
-  //   }
-
-  //   titlescreen.update();
-  //   window.clear();
-  //   titlescreen.render(window);
-  //   window.display();
-  // }
-
-  // std::string username = titlescreen.getUsername();
-
-  // std::cout << "Username: " << username << std::endl;
-
   int screenWidth = config.columns * 32;
   int screenHeight = (config.rows * 32) + 100;
+
+  sf::RenderWindow titlewindow(sf::VideoMode(screenWidth, screenHeight),
+                               "Minesweeper", sf::Style::Close);
+
+  TitleScreen titlescreen(screenWidth, screenHeight);
+
+  while (titlewindow.isOpen()) {
+    sf::Event event;
+    while (titlewindow.pollEvent(event)) {
+      if (event.type == sf::Event::Closed) {
+        titlewindow.close();
+      } else {
+        titlescreen.handleEvent(event);
+      }
+    }
+
+    titlescreen.update();
+    titlewindow.clear();
+    titlescreen.render(titlewindow);
+    titlewindow.display();
+  }
+
+  std::string username = titlescreen.getUsername();
+
+  std::cout << "Username: " << username << std::endl;
 
   sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight),
                           "Minesweeper", sf::Style::Close);
@@ -76,7 +73,7 @@ int main() {
   window.setIcon(image.getSize().x, image.getSize().y, image.getPixelsPtr());
 
   GameScreen gamescreen(screenWidth, screenHeight, config.columns, config.rows,
-                        config.bombCount);
+                        config.bombCount, username);
   while (window.isOpen()) {
     sf::Event event;
     while (window.pollEvent(event)) {

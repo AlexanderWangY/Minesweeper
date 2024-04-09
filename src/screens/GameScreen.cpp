@@ -1,4 +1,5 @@
 #include "../classes/Board.h"
+#include "../utils/LeaderboardHelper.h"
 #include "../utils/SpriteHelper.h"
 #include "Screen.h"
 #include <SFML/Graphics/Rect.hpp>
@@ -6,17 +7,20 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <SFML/Window/VideoMode.hpp>
+#include <SFML/Window/WindowStyle.hpp>
 #include <cstdlib>
 #include <iostream>
 
 GameScreen::GameScreen(int _width, int _height, int _columns, int _rows,
-                       int _bombCount) {
+                       int _bombCount, std::string _username) {
   width = _width;
   height = _height;
   columns = _columns;
   rows = _rows;
   bombCount = _bombCount;
   flagsLeft = bombCount;
+  username = _username;
 
   myBoard.loadBoard(columns, rows, bombCount);
 
@@ -76,7 +80,6 @@ GameScreen::GameScreen(int _width, int _height, int _columns, int _rows,
   leader.setPosition(columns * 32.f - 176, 32 * (rows + 0.5));
 
   // Start timer!
-  timeElapsed = 0;
   timer.start();
 }
 
@@ -110,22 +113,51 @@ void GameScreen::handleEvent(sf::Event event) {
         debugMode = !debugMode;
       } else if (isClicked(happy, x, y)) {
         std::cout << "resetting game\n";
-        timer.reset();
         this->reset();
       } else if (isClicked(leader, x, y)) {
         std::cout << "Opening leaderboard\n";
-      } else if (isClicked(pause, x, y)) {
-        if (timer.getStatus()) {
-          timer.resume();
-        } else {
+        timer.pause();
+        paused = true;
+        myBoard.Disable();
+
+        int screenHeight = rows * 16 + 50;
+        int screenWidth = columns * 16;
+
+        sf::RenderWindow nWindow(sf::VideoMode(screenWidth, screenHeight),
+                                 "Leaderboard", sf::Style::Close);
+
+        Leaderboard leader(screenWidth, screenHeight);
+
+        while (nWindow.isOpen()) {
+          sf::Event event;
+          while (nWindow.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+              nWindow.close();
+            }
+          }
+
+          nWindow.clear(sf::Color::Blue);
+          leader.render(nWindow);
+          nWindow.display();
+        }
+
+        if (!gameOver) {
+          timer.start();
+          paused = false;
+          myBoard.toggleDisable();
+        }
+      } else if (isClicked(pause, x, y) && !gameOver) {
+        if (timer.running()) {
           timer.pause();
+        } else {
+          timer.start();
         }
         debugMode = false;
         paused = !paused;
         myBoard.toggleDisable();
       }
 
-    } else if (event.mouseButton.button == sf::Mouse::Right) {
+    } else if (event.mouseButton.button == sf::Mouse::Right && !gameOver) {
       int x = event.mouseButton.x;
       int y = event.mouseButton.y;
 
@@ -141,17 +173,21 @@ void GameScreen::handleEvent(sf::Event event) {
       } else if (result == 404) {
         // Nothing
       }
+
+      if (myBoard.checkForWin()) {
+        gameOver = true;
+        winner = true;
+        timeTaken = timer.getElapsedTime();
+        paused = true;
+        timer.pause();
+        myBoard.Disable();
+        setScore(username, timeTaken);
+      }
     }
   }
 }
 
 void GameScreen::update() {
-  if (myBoard.checkForWin()) {
-    gameOver = true;
-    winner = true;
-    myBoard.Disable();
-  }
-
   // Calculate how many flags left
   if (flagsLeft >= 0) {
     int hundred = flagsLeft / 100;
@@ -256,4 +292,7 @@ void GameScreen::reset() {
   pause.setPosition(columns * 32.f - 240, 32 * (rows + 0.5));
   play.setPosition(columns * 32.f - 240, 32 * (rows + 0.5));
   leader.setPosition(columns * 32.f - 176, 32 * (rows + 0.5));
+
+  timer.reset();
+  timer.start();
 }

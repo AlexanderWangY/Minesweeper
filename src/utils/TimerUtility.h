@@ -1,81 +1,49 @@
 #pragma once
-
-#include <atomic>
 #include <chrono>
-#include <thread>
 
 class Timer {
 private:
-  std::chrono::steady_clock::time_point startTime;
-  std::chrono::steady_clock::time_point pauseTime;
-  std::chrono::steady_clock::duration pauseDuration = std::chrono::seconds(0);
-  std::atomic<bool> alive;
-  std::atomic<int> elapsedTime;
-  std::atomic<int> lastTime;
-  std::thread timerThread;
-  bool paused = false;
-
-  void runTimer() {
-    while (alive) {
-      auto currentTime = std::chrono::steady_clock::now();
-      auto duration = std::chrono::duration_cast<std::chrono::seconds>(
-          currentTime - startTime);
-      elapsedTime = duration.count();
-      std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
-  }
+  std::chrono::time_point<std::chrono::steady_clock> start_time;
+  std::chrono::duration<int> elapsed_time;
+  bool is_running;
 
 public:
   Timer() {
-    alive = false;
-    elapsedTime = 0;
-  }
+    is_running = false;
+    elapsed_time = std::chrono::seconds(0);
+  };
 
   void start() {
-    if (!alive) {
-      alive = true;
-      startTime = std::chrono::steady_clock::now();
-      timerThread = std::thread(&Timer::runTimer, this);
-    }
-  }
-
-  void stop() {
-    if (alive) {
-      alive = false;
-      if (timerThread.joinable()) {
-        timerThread.join();
-      }
+    if (!is_running) {
+      start_time = std::chrono::steady_clock::now();
+      is_running = true;
     }
   }
 
   void pause() {
-    paused = true;
-    lastTime = elapsedTime.load();
-    if (alive) {
-      pauseTime = std::chrono::steady_clock::now();
+    if (is_running) {
+      auto now = std::chrono::steady_clock::now();
+      elapsed_time +=
+          std::chrono::duration_cast<std::chrono::seconds>(now - start_time);
+      is_running = false;
     }
-  }
-
-  void resume() {
-    if (alive) {
-      auto currentTime = std::chrono::steady_clock::now();
-      pauseDuration += currentTime - pauseTime;
-    }
-    paused = false;
   }
 
   void reset() {
-    startTime = std::chrono::steady_clock::now();
-    pauseDuration = std::chrono::seconds(0);
+    elapsed_time = std::chrono::duration<int>::zero();
+    is_running = false;
   }
-
-  bool getStatus() { return paused; }
 
   int getElapsedTime() {
-    if (paused) {
-      return lastTime.load();
+    if (is_running) {
+      auto now = std::chrono::steady_clock::now();
+      auto time = std::chrono::duration_cast<std::chrono::seconds>(
+          now - start_time + elapsed_time);
+      return time.count();
     } else {
-      return elapsedTime.load();
+      return elapsed_time.count();
     }
   }
+
+  bool running() { return is_running; }
 };
