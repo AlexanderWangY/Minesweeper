@@ -74,6 +74,10 @@ GameScreen::GameScreen(int _width, int _height, int _columns, int _rows,
   pause.setPosition(columns * 32.f - 240, 32 * (rows + 0.5));
   play.setPosition(columns * 32.f - 240, 32 * (rows + 0.5));
   leader.setPosition(columns * 32.f - 176, 32 * (rows + 0.5));
+
+  // Start timer!
+  timeElapsed = 0;
+  timer.start();
 }
 
 void GameScreen::handleEvent(sf::Event event) {
@@ -92,6 +96,7 @@ void GameScreen::handleEvent(sf::Event event) {
       if (result == -1) {
         winner = false;
         gameOver = true;
+        myBoard.toggleDisable();
       } else if (result == 1) {
         std::cout << "You can't reveal a flag.\n";
       } else if (result == 404) {
@@ -105,10 +110,16 @@ void GameScreen::handleEvent(sf::Event event) {
         debugMode = !debugMode;
       } else if (isClicked(happy, x, y)) {
         std::cout << "resetting game\n";
+        timer.reset();
         this->reset();
       } else if (isClicked(leader, x, y)) {
         std::cout << "Opening leaderboard\n";
       } else if (isClicked(pause, x, y)) {
+        if (timer.getStatus()) {
+          timer.resume();
+        } else {
+          timer.pause();
+        }
         debugMode = false;
         paused = !paused;
         myBoard.toggleDisable();
@@ -128,7 +139,7 @@ void GameScreen::handleEvent(sf::Event event) {
       } else if (result == 1) {
         std::cout << "Can't place flag over a revealed element!\n";
       } else if (result == 404) {
-        std::cout << "Clicked out of bounds!\n";
+        // Nothing
       }
     }
   }
@@ -138,6 +149,7 @@ void GameScreen::update() {
   if (myBoard.checkForWin()) {
     gameOver = true;
     winner = true;
+    myBoard.Disable();
   }
 
   // Calculate how many flags left
@@ -157,7 +169,24 @@ void GameScreen::update() {
     ones.setTexture(numberTextures[one]);
   }
 
-  std::cout << flagsLeft << std::endl;
+  // Calculate timer times
+  /*
+  10 minute == 600 seconds
+  1 minute = 60 seconds
+  */
+  int elapsedTime = timer.getElapsedTime();
+  timeElapsed = elapsedTime;
+  int tenMinutes = elapsedTime / 600;
+  elapsedTime = elapsedTime % 600;
+  int minutes = elapsedTime / 60;
+  elapsedTime = elapsedTime % 60;
+  int tenSeconds = elapsedTime / 10;
+  int seconds = elapsedTime % 10;
+
+  minuteTen.setTexture(numberTextures[tenMinutes]);
+  minute.setTexture(numberTextures[minutes]);
+  secondTen.setTexture(numberTextures[tenSeconds]);
+  second.setTexture(numberTextures[seconds]);
 }
 
 void GameScreen::render(sf::RenderWindow &_window) {

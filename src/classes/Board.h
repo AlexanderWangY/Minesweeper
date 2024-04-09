@@ -180,6 +180,8 @@ public:
     disabled = !disabled;
   }
 
+  void Disable() { disabled = true; }
+
   void Display() {
     for (std::vector<int> x : board) {
       for (int val : x) {

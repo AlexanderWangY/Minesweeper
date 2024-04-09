@@ -1,5 +1,6 @@
 #pragma once
 #include "../classes/Board.h"
+#include "../utils/TimerUtility.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -56,6 +57,7 @@ private:
 
   // For timer
   std::unordered_map<int, sf::Texture> numberTextures;
+  int timeElapsed;
   sf::Sprite hundreth;
   sf::Sprite tens;
   sf::Sprite ones;
@@ -64,6 +66,9 @@ private:
   sf::Sprite minute;
   sf::Sprite secondTen;
   sf::Sprite second;
+
+  // Actual Chrono Timer class
+  Timer timer;
 
   // For game logic
   bool gameOver = false;

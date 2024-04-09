@@ -77,12 +77,10 @@ public:
   }
 
   void Reveal() {
-    std::cout << "Revealing!" << std::endl;
     if (type == 0 && !state.revealed) {
       state.revealed = true;
 
       for (Cell *c : nearbyCells) {
-        std::cout << "Revealing another\n";
         c->Reveal();
       }
     } else {
@@ -91,8 +89,6 @@ public:
   }
 
   void setNearbyCells(std::vector<std::vector<Cell>> &board) {
-
-    std::cout << "Setting nearby cells.\n";
 
     for (int dy = -1; dy <= 1; ++dy) {
       for (int dx = -1; dx <= 1; ++dx) {
@@ -110,8 +106,6 @@ public:
         }
       }
     }
-
-    std::cout << nearbyCells.size() << std::endl;
   }
 
   void render(sf::RenderWindow &window, bool debug) {

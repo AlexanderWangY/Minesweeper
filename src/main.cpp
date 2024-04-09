@@ -3,6 +3,7 @@
 #include "screens/Screen.h"
 #include "utils/RandomHelper.h"
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/VideoMode.hpp>
@@ -19,6 +20,9 @@ struct Config {
 
 int main() {
   Config config;
+  auto image = sf::Image{};
+
+  image.loadFromFile("./files/images/mine.png");
 
   std::ifstream file("./files/config.cfg");
   std::string line;
@@ -68,6 +72,8 @@ int main() {
 
   sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight),
                           "Minesweeper", sf::Style::Close);
+
+  window.setIcon(image.getSize().x, image.getSize().y, image.getPixelsPtr());
 
   GameScreen gamescreen(screenWidth, screenHeight, config.columns, config.rows,
                         config.bombCount);
